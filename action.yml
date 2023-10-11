@@ -29,6 +29,7 @@ jobs:
           sudo apt install -y g++
           sudo apt install -y clang
           sudo apt install -y llvm
+          sudo apt install -y gcc
 
       - name: Compile C++ code
         run: |
@@ -75,10 +76,28 @@ jobs:
             exit 1
           fi
 
-      - name: generation IR code
+      - name: Generate asm code
         run: |
           success=false
-          # generate with different C++ standards
+          # Compile with different C++ standards
+          if g++ -std=c++03 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc03.s; then
+            success=true
+          fi
+          if g++ -std=c++11 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc11.s; then
+            success=true
+          fi
+          if g++ -std=c++14 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc14.s; then
+            success=true
+          fi
+          if g++ -std=c++17 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc17.s; then
+            success=true
+          fi
+          if g++ -std=c++20 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc20.s; then
+            success=true
+          fi
+          if g++ -std=c++23 -Wall -Wextra -Werror -pedantic -c main.cpp -o gcc23.s; then
+            success=true
+          fi
           if clang++ -std=c++03 -Wall -Wextra -Werror -pedantic -S main.cpp -o clang03.s; then
             success=true
           fi
@@ -97,7 +116,7 @@ jobs:
           if clang++ -std=c++2b -Wall -Wextra -Werror -pedantic -S main.cpp -o clang23.s; then
             success=true
           fi
-          # Exit with a non-zero status if none of the generate succeeded
+          # Exit with a non-zero status if none of the generation succeeded
           if ! $success; then
             exit 1
           fi
